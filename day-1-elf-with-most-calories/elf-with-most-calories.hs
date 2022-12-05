@@ -8,8 +8,10 @@ import Data.Ord
 
 getElfCalorieSums = do
   contents <- readFile "input"
-  let elfCalorieLists = groupBy ((==) `on` (all isSpace)) $ lines contents
-  return [sum [read c | c <- elf] | elf <- elfCalorieLists, elf /= [""]]
+  let elfCalorieLists = filter (/= [""])
+        $ groupBy ((==) `on` (/= ""))
+        $ lines contents
+  return (map (sum . (map read)) elfCalorieLists)
 
 main = do
   elfCalorieSums <- getElfCalorieSums
