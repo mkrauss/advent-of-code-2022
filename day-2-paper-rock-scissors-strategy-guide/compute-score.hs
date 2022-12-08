@@ -1,10 +1,29 @@
 data Move = Rock | Paper | Scissors
   deriving (Enum, Read, Show, Eq, Ord)
 
+data Goal = Lose | Draw | Win
+  deriving (Enum, Read, Show, Eq, Ord)
+
 translateMove :: String -> Move
 translateMove "A" = Rock
 translateMove "B" = Paper
 translateMove "C" = Scissors
+
+translateGoal :: String -> Goal
+translateGoal "X" = Lose
+translateGoal "Y" = Draw
+translateGoal "Z" = Win
+
+translateResponse :: Move -> Goal -> Move
+translateResponse Rock Lose = Scissors
+translateResponse Rock Draw = Rock
+translateResponse Rock Win = Paper
+translateResponse Paper Lose = Rock
+translateResponse Paper Draw = Paper
+translateResponse Paper Win = Scissors
+translateResponse Scissors Lose = Paper
+translateResponse Scissors Draw = Scissors
+translateResponse Scissors Win = Rock
 
 translateResponseBroken :: String -> Move
 translateResponseBroken "X" = Rock
@@ -14,9 +33,12 @@ translateResponseBroken "Z" = Scissors
 translateRoundBroken (theirs:ours:_) =
   (translateMove theirs, translateResponseBroken ours)
 
-translateGuide filePath = do
+translateRound (theirs:ours:_) =
+  (translateMove theirs, translateResponse (translateMove theirs) (translateGoal ours))
+
+translateGuide filePath roundTranslator = do
   contents <- readFile filePath
-  return $ map (translateRoundBroken . words) $ lines contents
+  return $ map (roundTranslator . words) $ lines contents
 
 scoreForShape :: Move -> Integer
 scoreForShape Rock = 1
@@ -36,10 +58,12 @@ scoreForOutcome theirs ours
 
 scoreForRound (theirs, ours) = scoreForShape ours + scoreForOutcome theirs ours
 
-computeScoreFromGuide filePath = do
-  guide <- translateGuide filePath
+computeScoreFromGuide filePath roundTranslator = do
+  guide <- translateGuide filePath roundTranslator
   return $ sum $ map scoreForRound guide
 
 main = do
-  score <- computeScoreFromGuide "input"
-  putStr $ "Score for first star: " ++ show score ++ "\n"
+  brokenScore <- computeScoreFromGuide "input" translateRoundBroken
+  score <- computeScoreFromGuide "input" translateRound
+  putStr $ "Score for first star: " ++ show brokenScore ++ "\n"
+  putStr $ "Score for second star: " ++ show score ++ "\n"
