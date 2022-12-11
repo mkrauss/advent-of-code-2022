@@ -17,7 +17,11 @@ contains (a1, a2) (b1, b2) = a1 <= b1 && a2 >= b2
 redundantAssignment (a, b) = (a `contains` b) || (b `contains` a)
 countRedundant = length . filter redundantAssignment
 
+overlappingAssignment ((a1, a2), (b1, b2)) = (a2 >=  b1) && (a1 <= b2)
+countOverlapping = length . filter overlappingAssignment
+
 main = do
   input <- readFile "input"
   let assignments = parseAssignments input
   putStr $ "count contains: " ++ show (countRedundant assignments) ++ "\n"
+  putStr $ "count overlapping: " ++ show (countOverlapping assignments) ++ "\n"
