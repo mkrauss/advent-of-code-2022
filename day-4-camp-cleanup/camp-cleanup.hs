@@ -1,8 +1,5 @@
-parsePair :: Char -> [Char] -> ([Char], [Char])
 parsePair delimiter subject =
-  let (a, b') = break (== delimiter) subject in
-    let b = (drop 1 b') in
-      (a, b)
+  let (a, _:b) = break (== delimiter) subject in (a, b)
 
 parsePairOfRanges :: [Char] -> (([Char], [Char]), ([Char], [Char]))
 parsePairOfRanges subject =
@@ -18,7 +15,7 @@ parseAssignments input = fmap parseAssignment $ lines input
 
 contains (a1, a2) (b1, b2) = a1 <= b1 && a2 >= b2
 redundantAssignment (a, b) = (a `contains` b) || (b `contains` a)
-countRedundant assignments = length $ filter redundantAssignment assignments
+countRedundant = length . filter redundantAssignment
 
 main = do
   input <- readFile "input"
