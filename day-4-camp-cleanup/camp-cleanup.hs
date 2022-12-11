@@ -14,14 +14,14 @@ parseAssignment subject =
 parseAssignments input = fmap parseAssignment $ lines input
 
 contains (a1, a2) (b1, b2) = a1 <= b1 && a2 >= b2
-redundantAssignment (a, b) = (a `contains` b) || (b `contains` a)
-countRedundant = length . filter redundantAssignment
+redundant (a, b) = (a `contains` b) || (b `contains` a)
 
-overlappingAssignment ((a1, a2), (b1, b2)) = (a2 >=  b1) && (a1 <= b2)
-countOverlapping = length . filter overlappingAssignment
+overlapping ((a1, a2), (b1, b2)) = (a2 >=  b1) && (a1 <= b2)
+
+count f = length . filter f
 
 main = do
   input <- readFile "input"
   let assignments = parseAssignments input
-  putStr $ "count contains: " ++ show (countRedundant assignments) ++ "\n"
-  putStr $ "count overlapping: " ++ show (countOverlapping assignments) ++ "\n"
+  putStr $ "count redundant: " ++ show (count redundant assignments) ++ "\n"
+  putStr $ "count overlapping: " ++ show (count overlapping assignments) ++ "\n"
